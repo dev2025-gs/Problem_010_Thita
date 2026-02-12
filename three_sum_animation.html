@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Container With Most Water – Visualizer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+      }
+
+      h1 {
+        margin-bottom: 5px;
+      }
+
+      input {
+        width: 400px;
+        padding: 8px;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 8px 14px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-left: 8px;
+      }
+
+      #chart {
+        display: flex;
+        align-items: flex-end;
+        height: 300px;
+        margin-top: 30px;
+        border-left: 2px solid #333;
+        border-bottom: 2px solid #333;
+        padding: 10px;
+        gap: 6px;
+      }
+
+      .bar {
+        width: 30px;
+        background: steelblue;
+        position: relative;
+      }
+
+      .bar.left {
+        background: orange;
+      }
+
+      .bar.right {
+        background: crimson;
+      }
+
+      .bar span {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+      }
+
+      #water {
+        position: absolute;
+        background: rgba(0, 150, 255, 0.3);
+        pointer-events: none;
+      }
+
+      #info {
+        margin-top: 20px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>threeSumSmaller – Animation</h1>
+    <p>Enter array (comma separated):</p>
+
+    <input id="input" value="-10,-8,-3,1,5" />
+    <input id="target" value="-5" style="width:100px; margin-left:10px;" placeholder="Target" />
+    <button onclick="start()">Start Animation</button>
+    <button onclick="step()" id="stepBtn" disabled>Step</button>
+
+    <div id="chartWrapper" style="position: relative">
+      <div id="chart"></div>
+    </div>
+
+    <div id="info"></div>
+
+    <script>
+      let nums = [], target = 0;
+      let i = 0, j = 1, k = 2, n = 0, ans = 0, running = false;
+
+      function start() {
+        nums = document.getElementById("input").value.split(",").map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+        target = parseInt(document.getElementById("target").value);
+        n = nums.length;
+        if (n < 3 || isNaN(target)) {
+          alert("Enter at least three numbers and a valid target");
+          return;
+        }
+        i = 0; j = 1; k = 2; ans = 0; running = true;
+        document.getElementById("stepBtn").disabled = false;
+        draw();
+      }
+
+      function step() {
+        if (!running) return;
+        if (i >= n - 2) {
+          running = false;
+          document.getElementById("info").innerHTML += "<br><strong>✅ Done!</strong>";
+          document.getElementById("stepBtn").disabled = true;
+          return;
+        }
+
+        // Check the current triplet
+        if (nums[i] + nums[j] + nums[k] < target) {
+          ans++;
+        }
+
+        // Move to next k, then j, then i
+        k++;
+        if (k >= n) {
+          j++;
+          k = j + 1;
+        }
+        if (j >= n - 1) {
+          i++;
+          j = i + 1;
+          k = j + 1;
+        }
+
+        draw();
+      }
+
+      function draw() {
+        const chart = document.getElementById("chart");
+        chart.innerHTML = "";
+        nums.forEach((val, idx) => {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          if (idx === i) bar.style.background = "orange";
+          else if (idx === j) bar.style.background = "crimson";
+          else if (idx === k) bar.style.background = "seagreen";
+          bar.style.height = (val * 8 + 120) + "px";
+          bar.title = val;
+          const label = document.createElement("span");
+          label.textContent = val;
+          bar.appendChild(label);
+          chart.appendChild(bar);
+        });
+        let triplet = (i < n-2 && j < n-1 && k < n) ? `[${nums[i]}, ${nums[j]}, ${nums[k]}]` : "-";
+        let sum = (i < n-2 && j < n-1 && k < n) ? nums[i] + nums[j] + nums[k] : "-";
+        document.getElementById("info").innerHTML =
+          `i = ${i}, j = ${j}, k = ${k}<br>
+          Current triplet: ${triplet}<br>
+          Triplet sum: ${sum}<br>
+          Target: ${target}<br>
+          Count so far: <b>${ans}</b>`;
+      }
+    </script>
+  </body>
+</html>
